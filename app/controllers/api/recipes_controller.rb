@@ -17,6 +17,7 @@ class Api::RecipesController < ApplicationController
       chef: params["chef"],
       ingredients: params["ingredients"],
       directions: params["directions"],
+      user_id: current_user.id,
     )
     @recipe.save
     render "show.json.jb"
