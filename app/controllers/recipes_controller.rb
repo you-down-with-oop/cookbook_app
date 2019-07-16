@@ -19,7 +19,7 @@ class RecipesController < ApplicationController
       image_url: params[:input_image_url],
     )
     @recipe.save
-    redirect_to "/recipes"
+    redirect_to "/recipes/#{@recipe.id}"
   end
 
   def show
