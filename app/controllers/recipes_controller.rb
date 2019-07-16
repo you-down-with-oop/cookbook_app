@@ -19,8 +19,12 @@ class RecipesController < ApplicationController
       directions: params[:input_directions],
       image_url: params[:input_image_url],
     )
-    @recipe.save
-    redirect_to "/recipes/#{@recipe.id}"
+    if @recipe.save
+      redirect_to "/recipes/#{@recipe.id}"
+    else
+      @users = User.all
+      render "new.html.erb"
+    end
   end
 
   def show
