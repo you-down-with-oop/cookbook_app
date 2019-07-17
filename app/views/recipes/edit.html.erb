@@ -26,7 +26,11 @@
     Choose a user:
     <select name="user_id">
       <% @users.each do |user| %>
-        <option value="<%= user.id %>"><%= user.name %></option>
+        <% if user.id == @recipe.user_id %>
+          <option value="<%= user.id %>" selected><%= user.name %></option>
+        <% else %>
+          <option value="<%= user.id %>"><%= user.name %></option>
+        <% end %>
       <% end %>
     </select>
   </div>
