@@ -5,4 +5,5 @@
 <p>Directions: <%= @recipe.directions %></p>
 <p>Prep time: <%= @recipe.prep_time %></p>
 <a href="/recipes/<%= @recipe.id %>/edit">Edit recipe</a>
+<a href="/recipes/<%= @recipe.id %>" data-method="delete" rel="nofollow">Delete</a>
 <a href="/recipes">All recipes</a>
