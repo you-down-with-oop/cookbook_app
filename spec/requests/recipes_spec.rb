@@ -16,6 +16,40 @@ RSpec.describe "Recipes", type: :request do
     end
   end
 
+  describe "POST /recipes" do
+    it "creates a recipe" do
+      user = User.create!(name: "peter", email: "peter@email.com", password: "password")
+      jwt = JWT.encode({ user_id: user.id }, Rails.application.credentials.fetch(:secret_key_base), "HS256")
+
+      post "/api/recipes",
+        params: { title: "New title", ingredients: "Something", directions: "Something", prep_time: 100 },
+        headers: { "Authorization" => "Bearer #{jwt}" }
+      recipe = JSON.parse(response.body)
+
+      expect(response).to have_http_status(200)
+      expect(recipe["title"]).to eq("New title")
+    end
+
+    it "should be unprocessable with invalid params" do
+      user = User.create!(name: "peter", email: "peter@email.com", password: "password")
+      jwt = JWT.encode({ user_id: user.id }, Rails.application.credentials.fetch(:secret_key_base), "HS256")
+
+      post "/api/recipes",
+        params: {},
+        headers: { "Authorization" => "Bearer #{jwt}" }
+      recipe = JSON.parse(response.body)
+
+      expect(response).to have_http_status(422)
+    end
+
+    it "should be unauthorized without a valid jwt" do
+      post "/api/recipes", params: {}
+      recipe = JSON.parse(response.body)
+
+      expect(response).to have_http_status(401)
+    end
+  end
+
   describe "GET /recipes/:id" do
     it "returns a hash with the appropriate attributes" do
       user = User.create!(name: "peter", email: "peter@email.com", password: "password")
