@@ -1,4 +1,6 @@
 class Api::RecipesController < ApplicationController
+  before_action :authenticate_user, except: [:index, :show]
+
   def index
     @recipes = Recipe.all
 
@@ -21,8 +23,11 @@ class Api::RecipesController < ApplicationController
       image_url: params["image_url"],
       user_id: current_user.id,
     )
-    @recipe.save
-    render "show.json.jb"
+    if @recipe.save
+      render "show.json.jb"
+    else
+      render json: { errors: @recipe.errors.full_messages }, status: :unprocessable_entity
+    end
   end
 
   def show
@@ -38,8 +43,11 @@ class Api::RecipesController < ApplicationController
     @recipe.directions = params["directions"] || @recipe.directions
     @recipe.image_url = params["image_url"] || @recipe.image_url
     @recipe.prep_time = params["prep_time"] || @recipe.prep_time
-    @recipe.save
-    render "show.json.jb"
+    if @recipe.save
+      render "show.json.jb"
+    else
+      render json: { errors: @recipe.errors.full_messages }, status: :unprocessable_entity
+    end
   end
 
   def destroy

@@ -11,7 +11,7 @@ class RecipesController < ApplicationController
 
   def create
     @recipe = Recipe.new(
-      user_id: params[:user_id],
+      user_id: current_user.id,
       title: params[:input_title],
       chef: params[:input_chef],
       prep_time: params[:input_prep_time],
