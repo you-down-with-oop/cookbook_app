@@ -103,4 +103,28 @@ RSpec.describe "Recipes", type: :request do
       expect(response).to have_http_status(401)
     end
   end
+
+  describe "DELETE /recipes/:id" do
+    it "deletes a recipe" do
+      user = User.create!(name: "peter", email: "peter@email.com", password: "password")
+      jwt = JWT.encode({ user_id: user.id }, Rails.application.credentials.fetch(:secret_key_base), "HS256")
+      Recipe.create!(title: "example title 1", chef: "example chef", ingredients: "fdsfd", directions: "...", image_url: "...", prep_time: 100, user_id: user.id)
+      Recipe.create!(title: "example title 2", chef: "example chef", ingredients: "fdsfd", directions: "...", image_url: "...", prep_time: 100, user_id: user.id)
+      Recipe.create!(title: "example title 3", chef: "example chef", ingredients: "fdsfd", directions: "...", image_url: "...", prep_time: 100, user_id: user.id)
+
+      delete "/api/recipes/#{Recipe.first.id}",
+        headers: { "Authorization" => "Bearer #{jwt}" }
+      message = JSON.parse(response.body)
+
+      expect(response).to have_http_status(200)
+      expect(Recipe.count).to eq(2)
+    end
+
+    it "should be unauthorized without a valid jwt" do
+      delete "/api/recipes/1"
+      recipe = JSON.parse(response.body)
+
+      expect(response).to have_http_status(401)
+    end
+  end
 end
