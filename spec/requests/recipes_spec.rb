@@ -67,4 +67,40 @@ RSpec.describe "Recipes", type: :request do
       expect(recipe["prep_time"]).to eq(100)
     end
   end
+
+  describe "PATCH /recipes/:id" do
+    it "updates a recipe" do
+      user = User.create!(name: "peter", email: "peter@email.com", password: "password")
+      jwt = JWT.encode({ user_id: user.id }, Rails.application.credentials.fetch(:secret_key_base), "HS256")
+      recipe = Recipe.create!(title: "example title 1", chef: "example chef", ingredients: "fdsfd", directions: "...", image_url: "...", prep_time: 100, user_id: user.id)
+
+      patch "/api/recipes/#{recipe.id}",
+        params: { title: "Updated title" },
+        headers: { "Authorization" => "Bearer #{jwt}" }
+      recipe = JSON.parse(response.body)
+
+      expect(response).to have_http_status(200)
+      expect(recipe["title"]).to eq("Updated title")
+    end
+
+    it "should be unprocessable with invalid params" do
+      user = User.create!(name: "peter", email: "peter@email.com", password: "password")
+      jwt = JWT.encode({ user_id: user.id }, Rails.application.credentials.fetch(:secret_key_base), "HS256")
+      recipe = Recipe.create!(title: "example title 1", chef: "example chef", ingredients: "fdsfd", directions: "...", image_url: "...", prep_time: 100, user_id: user.id)
+
+      patch "/api/recipes/#{recipe.id}",
+        params: { ingredients: "" },
+        headers: { "Authorization" => "Bearer #{jwt}" }
+      recipe = JSON.parse(response.body)
+
+      expect(response).to have_http_status(422)
+    end
+
+    it "should be unauthorized without a valid jwt" do
+      patch "/api/recipes/1", params: {}
+      recipe = JSON.parse(response.body)
+
+      expect(response).to have_http_status(401)
+    end
+  end
 end
